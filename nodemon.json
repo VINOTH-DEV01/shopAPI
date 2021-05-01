@@ -1,0 +1,5 @@
+{
+    "env": {
+        "MONGOS_ATLAS_PW": "user"
+    }
+}
