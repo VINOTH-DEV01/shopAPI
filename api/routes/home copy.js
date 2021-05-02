@@ -2,47 +2,60 @@ const express = require("express");
 const router = express.Router();
 const Products = require('./models/products');
 
+
 const Mongoose = require("mongoose");
+const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb://localhost:27017/myfirstDb";
 
-router.get('/', (req, res, next) => {
-    Mongoose.connect(uri, (err, db) => {
-        const arrayDataList = [];
-        const cursor = db.collection("productList2").find();
-        cursor.forEach((doc, err) => {
-            if (!err) {
-                console.log("getData");
-            }
-            arrayDataList.push(doc);
-        }, () => {
-            db.close();
-            console.log("arrayDataList************", arrayDataList);
-            res.render('home', {
-                dataResult:arrayDataList
-            });
-        });
-    });
-});
+
 router.post('/', (req, res, next) => {
+    /*const product = new Products({
+        _id: new Mongoose.Types.ObjectId,
+        name: req.body.name,
+        price: req.body.price
+    });
+    res.status(201).json({
+        message: "New prioduct is successfully created!",
+        createdProduct: product
+    }); *uccess case only mongoDB data passing  */
+
+
     const product = new Products({
         _id: new Mongoose.Types.ObjectId,
         name: req.body.name,
         price: req.body.price
     });
     console.log(product);
-    Mongoose.connect(uri, (err, db) => {
+    MongoClient.connect(uri, (err, db) => {
         if (err) {
             console.log("mongoDb connection is failed!");
         };
-        db.collection("productList2").insertOne(product, (err, res) => {
+        db.collection("productList").insertOne(productSchema, (err, res) => {
             if (err) {
                 console.log("Document create is failed!");
                 return err;
             };
             console.log("Document inserted!");
-            db.close(); //success db inside productList2 table (means collection is created and data is added - documents) //
+            db.close();
         });
     });
+    product.save().then((result) => {
+        console.log(result);
+        res.status(201).json({
+            message: "New prioduct is successfully created!",
+            createdProduct: {
+                name: result.name,
+                price: result.price
+            }
+        });
+    }).catch((error) => {
+        console.log(error);
+        res.status(500).json({
+            error: error
+        })
+    });
+
+
 });
 router.patch('/:productId', (req, res, next) => {
     const id = req.params.productId;
@@ -77,7 +90,7 @@ router.get('/:productId', (req, res, next) => {
     }).catch((error) => {
         console.log(error);
         res.status(500).json({
-            error: error
+            error: err
         })
     });
     /*
@@ -98,7 +111,7 @@ router.delete('/:productId', (req, res, next) => {
     }).catch((error) => {
         console.log(error);
         res.status(500).json({
-            error: error
+            error: err
         })
     });
     /*
