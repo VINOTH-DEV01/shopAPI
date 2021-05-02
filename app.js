@@ -6,16 +6,33 @@ const app = express();
 //  Body parser  req getting  // 
 app.use(express.json());
 app.use(express.urlencoded({
-  extended: true
+  extended: false
 }));
 
 app.use(express.static("public"));
-app.set("view engine", "ejs"); 
+app.set("view engine", "ejs");
 
 // Mongo DB connection setup // 
 const mongodb = require('mongodb');
-mongodb.connect("mongodb+srv://user:"+ process.env.MONGOS_ATLAS_PW + "@cluster0.mavgt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
-  useMongoClient: true
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb://localhost:27017";
+
+MongoClient.connect(uri, (err, db) => {
+  if (err) {
+    console.log("MongoDB connection failed!");
+  }
+  const data = {
+    name: 'Shoes',
+    price: '1200$'
+  }
+  const myDb = db.db("myfirstDb");
+  myDb.collection("users").insertOne(data, (err, res) => {
+    if (err) {
+      console.log("collection not inserted!");
+    }
+    console.log("Document inserted!");
+    db.close();
+  });
 });
 
 
@@ -63,7 +80,7 @@ app.use((req,res, next) => {
 }); */
 app.use('/cart', cartRoute);
 app.use('/single-product', singleProduct);
-app.use('/shop', shopRoute);                                                                                                                                        
+app.use('/shop', shopRoute);
 app.use('/', homeRoute);
 // app.get('/', logStuff, function (req, res, next) {
 //   res.send('User Info')
