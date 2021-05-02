@@ -2,16 +2,13 @@ const express = require("express");
 const router = express.Router();
 const Products = require('./models/products');
 const mongose = require("mongoose")
-const bodyParser = require('body-parser');
-
-// router.use(bodyParser.urlencoded());
-// router.use(bodyParser.json());
-// router.use(bodyParser.urlencoded({
-//     extended: false,
-// }));
 
 
 router.get('/', (req, res, next) => {
+    const products = {
+        name: req.body.name,
+        value: req.body.value
+    }
     Products.find().exec().then(doc => {
         if (doc.leength >= 0) {
             res.status(200).json({
@@ -27,25 +24,32 @@ router.get('/', (req, res, next) => {
     }).catch((error) => {
         console.log(error);
         res.status(500).json({
-            error: err
-        })
+            error: error,
+        });
     });
-    res.render("home", {
+    res.status(200).json({
+        message: " Handling GET request to /",
+        createProduct: products
+    });
+    /*res.render("home", {
         latestProductsList: 5000000,
         products: "abcdefg"
-    });
+    });*/
 });
 router.post('/', (req, res, next) => {
     const product = new Products({
         _id: new mongose.Schema.Types.ObjectId,
-        name: "Coffee",
-        price: "12$"
+        name: req.body.name,
+        price: req.body.price
     });
     product.save().then((result) => {
         console.log(result);
         res.status(200).json({
-            message: "Handling POST REQUEST TO  / products ",
-            getProducts: result
+            message: "New prioduct is successfully created!",
+            createdProduct: {
+                name: result.name,
+                price: result.price
+            }
         });
     }).catch((error) => {
         console.log(error);
@@ -65,12 +69,11 @@ router.patch('/:productId', (req, res, next) => {
             name: req.body.newName,
             price: req.body.newPrice
         }
-    }
-    }}).exec().then(result => {
+    }).exec().then(result => {
         res.status(200).json(result);
     }).catch(err => {
         res.status(500).json({
-                error: err
+            error: err
         });
     });
 

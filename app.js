@@ -1,6 +1,13 @@
 const express = require("express");
 const app = express();
-const morgan = require('morgan');
+// const morgan = require('morgan');
+
+
+//  Body parser  req getting  // 
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: true
+}));
 
 app.use(express.static("public"));
 app.set("view engine", "ejs"); 
@@ -10,6 +17,9 @@ const mongodb = require('mongodb');
 mongodb.connect("mongodb+srv://user:"+ process.env.MONGOS_ATLAS_PW + "@cluster0.mavgt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
   useMongoClient: true
 });
+
+
+
 
 const cartRoute = require('./api/routes/cart');
 const singleProduct = require('./api/routes/single-product');
