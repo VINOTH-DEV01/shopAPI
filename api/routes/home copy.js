@@ -8,6 +8,22 @@ const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb://localhost:27017/myfirstDb";
 
 
+
+
+
+// router.get('/:productId', (req, res, next) => {
+//     const id = req.params.id;
+//      Products.findById(id).exec().then((result) => {
+//          console.log("result", result);
+//          res.status(200).json({
+//              message:"your discovered the Id",
+//              data:result
+//          });
+//      }).catch(err => err);
+ 
+//  });
+
+
 router.post('/', (req, res, next) => {
     /*const product = new Products({
         _id: new Mongoose.Types.ObjectId,
